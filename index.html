@@ -1,0 +1,63 @@
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+</head>
+<body>
+    
+    <div class=" bg-slate-800 min-h-screen flex justify-center items-center mx-auto">
+      <div class=" w-1/4 bg-slate-700 rounded py-6 px-4 h-auto shadow-md shadow-pink-600">
+       <div class="space-y-6">
+        <select id='voiceList' class="border ring-0 rounded bg-slate-800 border-pink-700 outline-none text-white w-full h-10"></select>
+        <textarea id='txtInput' rows="5" class="bg-slate-800 text-white border border-pink-700 outline-none rounded w-full p-2" placeholder="Type your text..."></textarea>
+        <button id='btnSpeak' class="border px-4 py-1 border-pink-800 bg-slate-800 shadow-md shadow-pink-600 uppercase text-white rounded-full">Speak!</button>
+       </div>
+      </div>
+    </div>
+
+    <script>
+        var txtInput = document.querySelector('#txtInput');
+        var voiceList = document.querySelector('#voiceList');
+        var btnSpeak = document.querySelector('#btnSpeak');
+        var synth = window.speechSynthesis;
+        var voices = [];
+
+        PopulateVoices();
+        if(speechSynthesis !== undefined){
+            speechSynthesis.onvoiceschanged = PopulateVoices;
+        }
+
+        btnSpeak.addEventListener('click', ()=> {
+            var toSpeak = new SpeechSynthesisUtterance(txtInput.value);
+            var selectedVoiceName = voiceList.selectedOptions[0].getAttribute('data-name');
+            voices.forEach((voice)=>{
+                if(voice.name === selectedVoiceName){
+                    toSpeak.voice = voice;
+                }
+            });
+            synth.speak(toSpeak);
+        });
+
+        function PopulateVoices(){
+            voices = synth.getVoices();
+            var selectedIndex = voiceList.selectedIndex < 0 ? 0 : voiceList.selectedIndex;
+            voiceList.innerHTML = '';
+            voices.forEach((voice)=>{
+                var listItem = document.createElement('option');
+                listItem.textContent = voice.name;
+                listItem.setAttribute('data-lang', voice.lang);
+                listItem.setAttribute('data-name', voice.name);
+                voiceList.appendChild(listItem);
+            });
+
+            voiceList.selectedIndex = selectedIndex;
+        }
+    </script>
+    <script type="module" src="/main.js"></script>
+</body>
+</html>
